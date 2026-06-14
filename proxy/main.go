@@ -98,9 +98,11 @@ func main() {
 
 	ensureDirs()
 	ensureConfigured()
-	// Must run every boot: onboard is skipped when config already exists on disk, but we still
-	// need to sync gateway.controlUi (allowedOrigins for Render hostname, etc.).
-	applyRequiredConfig()
+	// acc: skip applyRequiredConfig() — we ship a complete pre-rendered openclaw.json and run the
+	// gateway with --allow-unconfigured. The control-UI origin sync rewrites/normalizes the config
+	// (producing an empty openclaw.json5 that breaks gateway start) and is only needed for the web
+	// Control UI, which we don't use (our channel is Telegram).
+	// applyRequiredConfig()
 	go startGateway()
 	go pollGatewayHealth()
 
