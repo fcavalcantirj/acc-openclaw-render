@@ -15,5 +15,12 @@ cp /etc/secrets/SOUL.md   /data/workspace/SOUL.md
 cp /etc/secrets/AGENTS.md /data/workspace/AGENTS.md
 # MEMORY.md is the agent's LEARNED memory → seed only if absent, never overwrite (persists on the disk).
 [ -f /data/workspace/MEMORY.md ] || cp /etc/secrets/MEMORY.md /data/workspace/MEMORY.md
+# Vendored skills (kb-lookup, secureclaw) shipped as a base64 tarball (secret-file names can't have
+# slashes, so the multi-file tree travels as one file). Authoritative → wipe + re-extract each boot.
+if [ -f /etc/secrets/skills.tgz.b64 ]; then
+  rm -rf /data/.openclaw/skills && mkdir -p /data/.openclaw/skills
+  base64 -d /etc/secrets/skills.tgz.b64 | tar xz -C /data/.openclaw/skills \
+    && echo "acc-seed: skills extracted -> $(ls /data/.openclaw/skills 2>/dev/null | tr '\n' ' ')"
+fi
 echo "acc-seed: config refreshed ; MEMORY.md preserved-if-present ; launching proxy"
 exec /usr/local/bin/proxy
