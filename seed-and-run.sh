@@ -5,9 +5,12 @@
 # redeploy refreshes config only on first boot; runtime state persists on the disk afterward.
 set -e
 mkdir -p /data/.openclaw /data/workspace
-[ -f /data/.openclaw/openclaw.json ] || cp /etc/secrets/openclaw.json /data/.openclaw/openclaw.json
-[ -f /data/workspace/SOUL.md ]   || cp /etc/secrets/SOUL.md   /data/workspace/SOUL.md
-[ -f /data/workspace/AGENTS.md ] || cp /etc/secrets/AGENTS.md /data/workspace/AGENTS.md
-[ -f /data/workspace/MEMORY.md ] || cp /etc/secrets/MEMORY.md /data/workspace/MEMORY.md
-echo "acc-seed: config in place at /data/.openclaw ; launching proxy"
+# Always refresh CONFIG + cognitive files from secret files (idempotent). Runtime state
+# (sessions/, identity/, credentials/, telegram offsets) lives in separate files and is untouched,
+# so it persists across deploys while config stays authoritative from our secret files.
+cp /etc/secrets/openclaw.json /data/.openclaw/openclaw.json
+cp /etc/secrets/SOUL.md   /data/workspace/SOUL.md
+cp /etc/secrets/AGENTS.md /data/workspace/AGENTS.md
+cp /etc/secrets/MEMORY.md /data/workspace/MEMORY.md
+echo "acc-seed: config refreshed at /data/.openclaw ; launching proxy"
 exec /usr/local/bin/proxy
