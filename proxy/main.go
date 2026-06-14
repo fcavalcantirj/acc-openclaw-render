@@ -282,6 +282,7 @@ func startGateway() {
 	cmd := exec.Command("/usr/local/bin/openclaw", "gateway", "run",
 		"--port", gatewayPort,
 		"--bind", "loopback",
+		"--allow-unconfigured", // accept our pre-rendered config (matches local invocation; avoids the "suspicious config" block)
 	)
 	cmd.Env = envForOpenclaw(
 		"OPENCLAW_STATE_DIR="+stateDir,
